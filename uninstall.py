@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     subprocess.Popen(
 """
-python -c
+python3 -c
 \"import shutil, time;
 time.sleep(1);
 shutil.rmtree('{}');\"
