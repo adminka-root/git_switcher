@@ -2,40 +2,27 @@
 
 import os
 import sys
+import shutil
+from datetime import datetime
 
-def create_dir(directory: str, mode: str):
-    mode = int(mode, base=8)
-    if os.path.isdir(directory):
-        os.chmod(directory, mode)
-    else:
-        os.makedirs(directory, mode)
+
+def backup_file(file):
+    if os.path.isfile(file):
+        backup_postfix = datetime.now().strftime("%d_%m_%y_(%H:%M:%S)")
+        save_to = file + '_' + backup_postfix + '.bak'
+        shutil.copyfile(file, save_to)
 
 
 if __name__ == "__main__":
-    script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))  # '~/.local/share/git_switcher/'
-    os.chmod(script_dir, 448)  # 700
+    script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))  # '~/.local/share/git_switcher'
+    rc_file = os.path.expanduser('~/.bashrc')
 
-    # add in env
-    user_environment_dir = os.path.expanduser('~/.local/bin')
-    create_dir(user_environment_dir, mode='755')
-    if user_environment_dir not in os.environ['PATH'].split(':'):
-        need_add = '\n' + 'if [ -d "$HOME/.local/bin" ] ; then PATH="$HOME/.local/bin:$PATH"; fi'
-        profile = os.path.expanduser('~/.profile')
-        with open(profile, 'a') as file:
+    backup_file(rc_file)
+    backup_file(os.path.expanduser('~/.ssh/config'))
+
+    need_add = f"if [ -d '{ script_dir }' ]; then alias git_swither='{ script_dir }/source/git_switcher.py'; " + \
+               f"alias git_swither_uninstall='{ script_dir }/uninstall.py'; fi"
+
+    with open(rc_file, 'r+') as file:
+        if need_add not in file.read():
             file.write(need_add)
-        print('Please execute this command to update the $PATH:\nsource ~/.profile')
-
-    # chmod and ln -s
-    dest = os.path.join(user_environment_dir, 'git_switcher_uninstall')
-    if os.path.exists(dest) or os.path.islink(dest):
-        os.remove(dest)
-    src = os.path.join(script_dir, 'uninstall.py')
-    os.chmod(src, 448)  # help if broken link
-    os.symlink(src, dest)
-
-    dest = os.path.join(user_environment_dir, 'git_switcher')
-    if os.path.exists(dest) or os.path.islink(dest):
-        os.remove(dest)
-    src = os.path.join(script_dir, 'source', 'git_switcher.py')
-    os.chmod(src, 448)
-    os.symlink(src, dest)

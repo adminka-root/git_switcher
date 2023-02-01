@@ -59,21 +59,12 @@ Answer: 0
 
 ## Installation
 
-Make a backup copy of the important system files that the script uses. This is optional, but good practice:
-
-```bash
-if [[ -f ~/.ssh/config ]]; then cp ~/.ssh/config ~/.ssh/config.bak; fi
-cp ~/.profile ~/.profile.bak
-```
-
-Then:
-
 ```bash
 cd ~/.local/share/
 git clone https://github.com/adminka-root/git_switcher.git
 cd git_switcher
 python3 install.py
-source ~/.profile
+source ~/.bashrc
 ```
 
 ## Uninstalling
