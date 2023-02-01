@@ -175,8 +175,16 @@ class git_switcher:
         user = input_while_empty('Enter your git user name: ')
         email = input_while_empty('Enter your git user mail: ')
 
-        need_generated_ssh = select_yes_or_no('Do you want to generate a pair of ssh keys (rsa 2048)?')
-        if need_generated_ssh:
+        key_file = ''
+        files_in_ssh_dir = return_list_of_all_files_in_dir(
+            directory=self._ssh_dir,
+            regex_exclude='.*\.pub|known_hosts.*|authorized_keys|config|.*\.json'
+        )
+        if len(files_in_ssh_dir) > 0 and select_yes_or_no('Do you want to select from existing keys?'):
+            index_of_selected_file = select_from_list(files_in_ssh_dir, type='one')
+            key_file = files_in_ssh_dir[index_of_selected_file]
+
+        elif select_yes_or_no('Do you want to generate a pair of ssh keys (rsa 2048)?'):
             key_name = input_while_empty('Enter key name: ')
             generate_exec = run(
                 [
@@ -193,16 +201,6 @@ class git_switcher:
                     self._ssh_dir,
                     key_name
                 )
-
-        elif select_yes_or_no('Do you want to select from existing keys?'):
-            files_in_ssh_dir = return_list_of_all_files_in_dir(
-                directory=self._ssh_dir,
-                regex_exclude='.*\.pub|known_hosts.*|authorized_keys|config|.*\.json'
-            )
-            index_of_selected_file = select_from_list(files_in_ssh_dir, type='one')
-            key_file = files_in_ssh_dir[index_of_selected_file]
-        else:
-            key_file = ''
 
         return {
             user: {
