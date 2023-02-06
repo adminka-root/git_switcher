@@ -20,8 +20,8 @@ if __name__ == "__main__":
     backup_file(rc_file)
     backup_file(os.path.expanduser('~/.ssh/config'))
 
-    need_add = f"if [ -d '{ script_dir }' ]; then alias git_swither='{ script_dir }/source/git_switcher.py'; " + \
-               f"alias git_swither_uninstall='{ script_dir }/uninstall.py'; fi"
+    need_add = f"if [ -d '{ script_dir }' ]; then alias git_switcher='{ script_dir }/source/git_switcher.py'; " + \
+               f"alias git_switcher_uninstall='{ script_dir }/uninstall.py'; fi"
 
     with open(rc_file, 'r+') as file:
         if need_add not in file.read():
