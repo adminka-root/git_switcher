@@ -24,8 +24,8 @@ if __name__ == "__main__":
     script_dir = os.path.expanduser('~/.local/share/git_switcher')
     rc_file = os.path.expanduser('~/.bashrc')
 
-    need_add = f"if [ -d '{ script_dir }' ]; then alias git_swither='{ script_dir }/source/git_switcher.py'; " + \
-               f"alias git_swither_uninstall='{ script_dir }/uninstall.py'; fi"
+    need_add = f"if [ -d '{ script_dir }' ]; then alias git_switcher='{ script_dir }/source/git_switcher.py'; " + \
+               f"alias git_switcher_uninstall='{ script_dir }/uninstall.py'; fi"
 
     rc_file_data = read_file(rc_file)
     if need_add in rc_file_data:
