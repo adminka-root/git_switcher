@@ -267,7 +267,7 @@ class git_switcher:
 
         identity_config = os.path.join(self._ssh_dir, 'config')
         record_block = '\n'.join([
-            'Host github.com',
+            'Host ' + self._server_name,
             'IdentityFile ' + private_key if private_key else ''
         ]) + '\n\n'
         success_record_in_config = self.parse_and_edit_config_in_ssh_dir(
