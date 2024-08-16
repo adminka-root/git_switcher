@@ -11,36 +11,46 @@ def backup_file(file):
         shutil.copyfile(file, save_to)
 
 def add_to_rc_file(file_path, content):
-    if os.path.isfile(file_path):
-        with open(file_path, 'r+') as file:
-            if content not in file.read():
-                file.write(content)
+    with open(file_path, 'r+') as file:
+        if content not in file.read():
+            file.write('\n' + content + '\n')
 
 if __name__ == "__main__":
     script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))  # '~/.local/share/git_switcher'
-    
-    # List of common shell configuration files
-    rc_files = [
-        '~/.bashrc',
-        '~/.zshrc',
-        '~/.bash_profile',
-        '~/.profile',
-        '~/.login',
-        '~/.zprofile'
-    ]
+    default_shell = os.path.basename(os.getenv('SHELL', ''))
 
-    # Backup and modify each existing rc file
-    for rc_file in rc_files:
-        rc_file_path = os.path.expanduser(rc_file)
-        if os.path.isfile(rc_file_path):
-            backup_file(rc_file_path)
-            
-            need_add = f"\nif [ -d '{ script_dir }' ]; then\n" \
-                       f"    alias git_switcher='{ script_dir }/source/git_switcher.py'\n" \
-                       f"    alias git_switcher_uninstall='{ script_dir }/uninstall.py'\n" \
-                       f"fi\n"
-            
-            add_to_rc_file(rc_file_path, need_add)
+    if default_shell in ['bash', 'sh']:
+        rc_file = '~/.bashrc'
+        need_add = f"""
+if [ -d '{script_dir}' ]; then
+    alias git_switcher='{script_dir}/source/git_switcher.py'
+    alias git_switcher_uninstall='{script_dir}/uninstall.py'
+fi
+"""
+    elif default_shell == 'zsh':
+        rc_file = '~/.zshrc'
+        need_add = f"""
+if [ -d '{script_dir}' ]; then
+    alias git_switcher='{script_dir}/source/git_switcher.py'
+    alias git_switcher_uninstall='{script_dir}/uninstall.py'
+fi
+"""
+    elif default_shell == 'csh' or default_shell == 'tcsh':
+        rc_file = '~/.cshrc'
+        need_add = f"""
+if ( -d '{script_dir}' ) then
+    alias git_switcher '{script_dir}/source/git_switcher.py'
+    alias git_switcher_uninstall '{script_dir}/uninstall.py'
+endif
+"""
+    else:
+        print(f"Unsupported shell: {default_shell}")
+        sys.exit(1)
 
-    # Backup SSH config
+    rc_file_path = os.path.expanduser(rc_file)
+    backup_file(rc_file_path)
     backup_file(os.path.expanduser('~/.ssh/config'))
+
+    add_to_rc_file(rc_file_path, need_add)
+
+    print(f"Installation complete. Aliases added to {rc_file}")
