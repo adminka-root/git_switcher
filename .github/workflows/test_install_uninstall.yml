@@ -44,7 +44,6 @@ jobs:
         
         # Source bashrc and export functions for use in this script
         source ~/.bashrc
-        export -f git_switcher git_switcher_uninstall
         
         echo "Defined aliases and functions:"
         alias
