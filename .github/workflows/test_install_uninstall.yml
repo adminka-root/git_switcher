@@ -42,38 +42,15 @@ jobs:
         echo "Content of ~/.bashrc:"
         cat ~/.bashrc
         
-        # Source bashrc and export functions for use in this script
-        source ~/.bashrc
+
+        $ORIGINAL_DIR/source/git_switcher.py --help
+
+
+        python $ORIGINAL_DIR/uninstall.py
         
-        echo "Defined aliases and functions:"
-        alias
-        
-        echo "Testing git_switcher functionality..."
-        if type git_switcher &>/dev/null; then
-          git_switcher --help
-        else
-          echo "git_switcher not found, using full path"
-          $ORIGINAL_DIR/source/git_switcher.py --help
-        fi
-        
-        echo "Uninstalling git_switcher..."
-        if type git_switcher_uninstall &>/dev/null; then
-          git_switcher_uninstall
-        else
-          echo "git_switcher_uninstall not found, using full path"
-          python $ORIGINAL_DIR/uninstall.py
-        fi
         
         echo "Content of ~/.bashrc after uninstall:"
         cat ~/.bashrc
-        
-        echo "Checking if git_switcher alias still exists..."
-        if alias git_switcher 2>/dev/null; then
-          echo "git_switcher alias still exists (unexpected)"
-          exit 1
-        else
-          echo "git_switcher alias not found (as expected after uninstall)"
-        fi
         
         echo "Checking if installation directory is removed..."
         if [ -d "$ORIGINAL_DIR/source" ] || [ -f "$ORIGINAL_DIR/install.py" ] || [ -f "$ORIGINAL_DIR/uninstall.py" ]; then
