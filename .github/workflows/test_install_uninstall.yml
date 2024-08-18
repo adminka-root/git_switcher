@@ -1,0 +1,76 @@
+name: Test git_switcher Install and Uninstall
+
+on:
+  push:
+    branches: [ main, patch-* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Comprehensive git_switcher test (Unix)
+      if: runner.os != 'Windows'
+      env:
+        SHELL: /bin/bash
+      run: |
+        set -e  # Exit immediately if a command exits with a non-zero status
+
+        echo "Current directory: $(pwd)"
+        echo "Contents of current directory:"
+        ls -R
+
+        ORIGINAL_DIR=$(pwd)
+
+        touch ~/.bashrc
+        echo "Bash RC file created/ensured"
+
+        echo "Installing git_switcher..."
+        python install.py
+        
+        echo "Content of ~/.bashrc:"
+        cat ~/.bashrc
+
+        echo "Defined aliases:"
+        alias
+
+        echo "Testing git_switcher functionality..."
+        python source/git_switcher.py --help
+
+        echo "Uninstalling git_switcher..."
+        python uninstall.py
+
+        echo "Content of ~/.bashrc after uninstall:"
+        cat ~/.bashrc
+
+        echo "Checking if git_switcher alias still exists..."
+        alias git_switcher && echo "git_switcher alias still exists (unexpected)" && exit 1 || echo "git_switcher alias not found (as expected after uninstall)"
+
+        echo "Checking if installation directory is removed..."
+        if [ -d "$GITHUB_WORKSPACE" ]; then
+          echo "Repository still exists"
+          exit 1
+        else
+          echo "Repository has been removed"
+          
+        fi
+
+        echo "All tests completed successfully!"
+
+        # Recreate the empty directory for post-job cleanup
+        mkdir -p "$ORIGINAL_DIR"
+        echo "Empty directory recreated for post-job cleanup"
+      shell: bash
