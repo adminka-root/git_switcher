@@ -44,6 +44,8 @@ jobs:
         echo "Content of ~/.bashrc:"
         cat ~/.bashrc
 
+        source ~/.bashrc
+
         echo "Defined aliases:"
         alias
 
