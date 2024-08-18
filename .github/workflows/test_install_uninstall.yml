@@ -48,10 +48,10 @@ jobs:
         alias
 
         echo "Testing git_switcher functionality..."
-        python source/git_switcher.py --help
+        git_switcher --help
 
         echo "Uninstalling git_switcher..."
-        python uninstall.py
+        git_switcher_uninstall
 
         echo "Content of ~/.bashrc after uninstall:"
         cat ~/.bashrc
