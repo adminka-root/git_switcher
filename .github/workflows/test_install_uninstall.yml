@@ -47,7 +47,6 @@ jobs:
         
         echo "Defined aliases and functions:"
         alias
-        declare -F | grep git_switcher
         
         echo "Testing git_switcher functionality..."
         if type git_switcher &>/dev/null; then
