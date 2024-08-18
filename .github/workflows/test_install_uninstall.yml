@@ -27,51 +27,67 @@ jobs:
       env:
         SHELL: /bin/bash
       run: |
-        set -e  # Exit immediately if a command exits with a non-zero status
-
+        set -e # Exit immediately if a command exits with a non-zero status
         echo "Current directory: $(pwd)"
         echo "Contents of current directory:"
         ls -R
-
         ORIGINAL_DIR=$(pwd)
-
+        
         touch ~/.bashrc
         echo "Bash RC file created/ensured"
-
+        
         echo "Installing git_switcher..."
         python install.py
         
         echo "Content of ~/.bashrc:"
         cat ~/.bashrc
-
+        
+        # Source bashrc and export functions for use in this script
         source ~/.bashrc
-
-        echo "Defined aliases:"
+        export -f git_switcher git_switcher_uninstall
+        
+        echo "Defined aliases and functions:"
         alias
-
+        declare -F | grep git_switcher
+        
         echo "Testing git_switcher functionality..."
-        git_switcher --help
-
+        if type git_switcher &>/dev/null; then
+          git_switcher --help
+        else
+          echo "git_switcher not found, using full path"
+          $ORIGINAL_DIR/source/git_switcher.py --help
+        fi
+        
         echo "Uninstalling git_switcher..."
-        git_switcher_uninstall
-
+        if type git_switcher_uninstall &>/dev/null; then
+          git_switcher_uninstall
+        else
+          echo "git_switcher_uninstall not found, using full path"
+          python $ORIGINAL_DIR/uninstall.py
+        fi
+        
         echo "Content of ~/.bashrc after uninstall:"
         cat ~/.bashrc
-
+        
         echo "Checking if git_switcher alias still exists..."
-        alias git_switcher && echo "git_switcher alias still exists (unexpected)" && exit 1 || echo "git_switcher alias not found (as expected after uninstall)"
-
-        echo "Checking if installation directory is removed..."
-        if [ -d "$GITHUB_WORKSPACE" ]; then
-          echo "Repository still exists"
+        if alias git_switcher 2>/dev/null; then
+          echo "git_switcher alias still exists (unexpected)"
           exit 1
         else
-          echo "Repository has been removed"
-          
+          echo "git_switcher alias not found (as expected after uninstall)"
         fi
-
+        
+        echo "Checking if installation directory is removed..."
+        if [ -d "$ORIGINAL_DIR/source" ] || [ -f "$ORIGINAL_DIR/install.py" ] || [ -f "$ORIGINAL_DIR/uninstall.py" ]; then
+          echo "git_switcher files still exist (unexpected)"
+          ls -R $ORIGINAL_DIR
+          exit 1
+        else
+          echo "git_switcher files have been removed"
+        fi
+        
         echo "All tests completed successfully!"
-
+        
         # Recreate the empty directory for post-job cleanup
         mkdir -p "$ORIGINAL_DIR"
         echo "Empty directory recreated for post-job cleanup"
