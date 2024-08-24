@@ -13,7 +13,7 @@ Script to switch git accounts
 optional arguments:
   -h, --help    show this help message and exit
 
-Параметры:
+Options:
   -a, --add     Add new account
   -d, --remove  Remove saved accounts
   -s, --switch  Switch to account

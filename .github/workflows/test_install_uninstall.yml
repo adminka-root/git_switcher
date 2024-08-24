@@ -1,3 +1,4 @@
+---
 name: Test git_switcher Install and Uninstall
 
 on:
@@ -67,3 +68,5 @@ jobs:
         mkdir -p "$ORIGINAL_DIR"
         echo "Empty directory recreated for post-job cleanup"
       shell: bash
+
+...
