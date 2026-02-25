@@ -178,7 +178,7 @@ class git_switcher:
         key_file = ''
         files_in_ssh_dir = return_list_of_all_files_in_dir(
             directory=self._ssh_dir,
-            regex_exclude='.*\.pub|known_hosts.*|authorized_keys|config|.*\.json'
+            regex_exclude='.*\\.pub|known_hosts.*|authorized_keys|config|.*\\.json'
         )
         if len(files_in_ssh_dir) > 0 and select_yes_or_no('Do you want to select from existing keys?'):
             index_of_selected_file = select_from_list(files_in_ssh_dir, type='one')
@@ -289,7 +289,7 @@ class git_switcher:
                 if start is not None:
                     stop = match.start()
                     break
-                if re.match('( )*Host\s*' + self._server_name + '( )*\n', match.group()):
+                if re.match('( )*Host\\s*' + self._server_name + '( )*\n', match.group()):
                     start = match.start()
 
             if start is not None:
